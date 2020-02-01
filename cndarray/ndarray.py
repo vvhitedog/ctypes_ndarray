@@ -1,5 +1,6 @@
 import ctypes as ct
 from numpy.ctypeslib import ndpointer
+import numpy as np
 
 ##############################################################################################
 # #
