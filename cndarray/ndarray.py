@@ -48,7 +48,7 @@ class NdArray(ct.Structure):
 
     _fields_ = [('m_data', ct.POINTER(ct.c_char)),
                 ('m_ndim', ct.c_int),
-                ('m_shape', ct.POINTER(ct.c_uint8)),
+                ('m_shape', ct.POINTER(ct.c_uint64)),
                 ('m_sizeofdtype', ct.c_int),
                 ('m_alloc', allocator_type),
                 ]
