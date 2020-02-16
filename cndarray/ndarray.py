@@ -51,6 +51,7 @@ class NdArray(ct.Structure):
                 ('m_shape', ct.POINTER(ct.c_uint64)),
                 ('m_sizeofdtype', ct.c_int),
                 ('m_alloc', allocator_type),
+                ('m_realloc', allocator_type),
                 ]
 
 
@@ -75,7 +76,13 @@ class NdArray(ct.Structure):
             self.arr = ret
             return ct.addressof(as_ctypes(ret))
 
+        def reallocator(nbytes):
+            ret = np.zeros((nbytes,), dtype='u1')
+            self.arr.resize((nbytes,))
+            return ct.addressof(as_ctypes(self.arr))
+
         aparam = allocator_type(allocator)
+        rparam = allocator_type(reallocator)
         self.m_sizeofdtype = np.dtype(dtype).itemsize
         if shape is None:
             # delay allocation until shape is known (in C++ or C code)
@@ -94,6 +101,7 @@ class NdArray(ct.Structure):
         self.m_ndim = ndim
         self.m_shape = shape
         self.m_alloc = aparam
+        self.m_realloc = rparam
 
 
     def asarray(self):

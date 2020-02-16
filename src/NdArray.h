@@ -21,6 +21,7 @@ struct NdArray {
 	uint64_t *m_shape;
 	int m_sizeofdtype;
 	NumpyAllocator *m_alloc;
+	NumpyAllocator *m_realloc;
 };
 
 }
