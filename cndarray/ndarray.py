@@ -14,6 +14,7 @@ __all__ = ['NdArray','allocator_type']
 
 
 allocator_type = ct.CFUNCTYPE(ct.c_char_p, ct.c_size_t, )
+set_dtype_type = ct.CFUNCTYPE(None, ct.c_char_p, )
 
 
 def as_ctypes(obj):
@@ -52,6 +53,8 @@ class NdArray(ct.Structure):
                 ('m_sizeofdtype', ct.c_int),
                 ('m_alloc', allocator_type),
                 ('m_realloc', allocator_type),
+                ('m_set_dtype', set_dtype_type),
+                ('m_dtype', ct.c_char_p),
                 ]
 
 
@@ -69,7 +72,9 @@ class NdArray(ct.Structure):
         """
 
         self.arr = None
-        self.dtype = dtype
+
+        def set_dtype(newdtype):
+            self.m_dtype = newdtype
 
         def allocator(nbytes):
             ret = np.zeros((nbytes,), dtype='u1')
@@ -77,7 +82,6 @@ class NdArray(ct.Structure):
             return ct.addressof(as_ctypes(ret))
 
         def reallocator(nbytes):
-            ret = np.zeros((nbytes,), dtype='u1')
             self.arr.resize((nbytes,))
             return ct.addressof(as_ctypes(self.arr))
 
@@ -102,6 +106,8 @@ class NdArray(ct.Structure):
         self.m_shape = shape
         self.m_alloc = aparam
         self.m_realloc = rparam
+        self.m_set_dtype = set_dtype_type(set_dtype)
+        self.m_dtype = dtype
 
 
     def asarray(self):
@@ -113,7 +119,7 @@ class NdArray(ct.Structure):
         """
         ndim = self.m_ndim
         shape = self.np_shape[:ndim]
-        return self.arr.view(self.dtype).reshape(shape).squeeze()
+        return self.arr.view(self.m_dtype).reshape(shape).squeeze()
 
 
 ##############################################################################################

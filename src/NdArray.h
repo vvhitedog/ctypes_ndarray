@@ -3,6 +3,7 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <cstring>
 
 //////////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -14,6 +15,7 @@
 extern "C" {
 
 typedef char* NumpyAllocator(size_t nbytes);
+typedef void SetDtypeFunc (const char *newdtype);
 
 struct NdArray {
 	char *m_data;
@@ -22,6 +24,8 @@ struct NdArray {
 	int m_sizeofdtype;
 	NumpyAllocator *m_alloc;
 	NumpyAllocator *m_realloc;
+  SetDtypeFunc *m_set_dtype;
+  char *m_dtype;
 };
 
 }
@@ -56,6 +60,9 @@ void inline ndarray_set_size(NdArray* arr, int ndim, uint64_t* dims) {
 	}
 }
 
+void inline ndarray_set_dtype(NdArray* arr, const char *dtype ) {
+  arr->m_set_dtype(dtype);
+}
 
 void inline ndarray_alloc(NdArray* arr) {
 	size_t nelem = 1;
